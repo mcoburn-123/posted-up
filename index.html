@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Personal shopping from Chicago farmers markets. Produce boxes, meat, bread and pantry goods from close-radius farms and local makers.">
+<meta name="description" content="Pilot season: personal shopping from Chicago farmers markets. Produce, meat, bread and pantry goods from farms and makers within 150 miles of the Loop.">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Posted Up Produce Orders</title>
 </head>
@@ -90,6 +90,20 @@ button{font:inherit;cursor:pointer}
 .ip{font:500 13px var(--mono);color:var(--ink)}
 .soon{margin:0;padding:18px 2px;color:var(--muted);font-style:italic}
 .mode{display:grid;gap:10px}
+.now{margin:14px 0 0;font:500 14px/1.4 var(--mono);color:var(--board-ink);background:color-mix(in srgb,var(--board-ink) 10%,transparent);border-radius:4px;padding:8px 10px;display:inline-block;max-width:100%}
+.story{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+.story h2{font-size:clamp(24px,3.6vw,30px);margin:6px 0 8px}
+.season,.radius{background:var(--panel);border:1.5px solid var(--line);border-radius:6px;padding:20px;min-width:0}
+.chips{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.chips li{background:var(--chip);border-radius:999px;padding:5px 12px;font-size:14px}
+.rings{width:100%;max-width:420px;display:block;margin:6px auto 4px}
+.ring{fill:none;stroke-width:1.5}
+.r1{stroke:var(--tomato)}.r2{stroke:var(--good)}.r3{stroke:var(--muted);stroke-dasharray:4 4}
+.dot{fill:var(--tomato)}
+.rl{fill:var(--ink);font:500 12px var(--body);text-anchor:middle}
+.quality{margin:10px 0 0;padding-left:18px;display:grid;gap:8px;font-size:14px}
+.pilot{grid-column:1/-1;margin:0;background:var(--chip);border-radius:6px;padding:14px 16px;font-size:15px}
+.thanks{margin:0;font-size:15px;color:var(--ink)}
 .terms{display:grid;gap:8px;border-top:3px solid var(--ink);padding-top:10px;scroll-margin-top:70px}
 .terms h2{font-size:clamp(22px,3.5vw,28px)}
 .terms ol{margin:0;padding-left:22px;display:grid;gap:8px;font-size:14px;max-width:70ch}
@@ -153,17 +167,49 @@ textarea{min-height:64px;resize:vertical}
 
 <div class="wrap">
   <header class="sign">
-    <div class="eyebrow">Posted Up Produce · Now taking orders</div>
+    <div class="eyebrow">Posted Up Produce · Pilot season, fall 2026</div>
     <h1>Market haul, <span>picked for you.</span></h1>
-    <p class="lede">We shop small farms and local makers within a close radius on market mornings, then pack your order for afternoon pickup. Choose a produce box, add meat, eggs or bread, and we handle the rest.</p>
+    <p class="lede">We shop small farms and local makers within 150 miles of the Loop on market mornings, then pack your order for afternoon pickup. Choose a produce box, add meat, eggs or bread, and we handle the rest.</p>
+    <p class="now" id="now" aria-live="polite">Chicago time</p>
     <ol class="steps">
       <li><b>Order by 9 PM</b> the night before. Pick a box size and any add-ons.</li>
       <li><b>We shop the morning market</b> and hand-select what's peaking that week.</li>
       <li><b>Meet us at The Post-Up</b> in Goose Island, Hyde Park or Rogers Park, or get <b>same-day delivery</b> Wednesday afternoons.</li>
     </ol>
     <div class="meta"><span>Goose Island 1–2 PM</span><span>Hyde Park 3–4 PM</span><span>Rogers Park 5–6 PM</span><span>Orders close 9 PM the night before</span></div>
-    <div class="stamp">CLOSE<br>RADIUS<br>GROWN</div>
+    <div class="stamp">WITHIN<br>150 MI<br>OF THE LOOP</div>
   </header>
+
+  <section class="story">
+    <div class="season">
+      <span class="eyebrow">In season in Chicago now</span>
+      <h2 id="seasonTitle">October harvest</h2>
+      <p class="note" id="seasonNote">What local farms are bringing to market this month. Boxes are built from whatever is peaking that week.</p>
+      <ul class="chips" id="seasonList"></ul>
+    </div>
+    <div class="radius">
+      <span class="eyebrow">Where your food comes from</span>
+      <h2>Everything within 150 miles</h2>
+      <svg viewBox="0 0 320 200" role="img" aria-labelledby="rTitle rDesc" class="rings">
+        <title id="rTitle">Sourcing radius from downtown Chicago</title>
+        <desc id="rDesc">Bakeries are within 15 miles, produce and orchard farms 60 to 100 miles, and meat and fish farms about 120 miles from the Loop.</desc>
+        <circle cx="160" cy="190" r="170" class="ring r3"/>
+        <circle cx="160" cy="190" r="125" class="ring r2"/>
+        <circle cx="160" cy="190" r="40" class="ring r1"/>
+        <circle cx="160" cy="190" r="6" class="dot"/>
+        <text x="160" y="176" class="rl">The Loop</text>
+        <text x="160" y="140" class="rl">Bakeries · under 15 mi</text>
+        <text x="160" y="92" class="rl">Produce &amp; orchards · 60–100 mi</text>
+        <text x="160" y="40" class="rl">Meat &amp; fish · about 120 mi</text>
+      </svg>
+      <ul class="quality">
+        <li><b>Picked days, not weeks, before you get it.</b> We buy the morning of pickup from the people who grew or baked it.</li>
+        <li><b>Hand-selected.</b> We choose every item ourselves at market and pass on anything we wouldn't take home.</li>
+        <li><b>Your money stays close.</b> Every order supports small farms and makers in Illinois, Indiana, Michigan and Wisconsin.</li>
+      </ul>
+    </div>
+    <p class="pilot"><b>This is a pilot.</b> We're testing Posted Up with a small group of neighbors through November 21. Prices, items and stops may change as we learn. Tell us what works and what doesn't: text 773-807-9223.</p>
+  </section>
 
   <div class="main">
     <div style="display:grid;gap:26px;min-width:0">
@@ -423,7 +469,8 @@ function renderTicket(){
     const pre=el("pre",{id:"orderPre"},txt);
     const msg=el("p",{class:"note",id:"copyMsg"},"");
     t.append(el("div",{class:"done"},
-      el("h2",{},"Your order ticket"),
+      el("h2",{},"Thank you for ordering!"),
+      el("p",{class:"thanks"},"You're one of our first Posted Up customers, and that means a lot. Every order keeps money with small farms and makers close to home and helps us shape this pilot."),
       el("p",{class:"note",style:"margin:0;color:var(--ink)"},state.sendStatus==="sending"?"Sending your order…":state.sendStatus==="sent"?
         "Your order is in. Last step: pay by 9 PM the night before. "+(ZELLE?"Zelle "+ZELLE+" and put POSTED and your order number in the memo.":"We'll text you payment details.")+" Orders are confirmed once paid.":
         "Last step: text this ticket to us by 9 PM the night before. It already starts with POSTED so we can find it. "+(ZELLE?"Then Zelle "+ZELLE+" with POSTED and your order number in the memo.":"We'll reply with payment details.")+" Orders are confirmed once paid."),
@@ -496,6 +543,33 @@ document.getElementById("barGo").addEventListener("click",()=>document.getElemen
 
 /* Open in a realistic working state: Half Peck selected as an example pick. */
 state.box="halfpeck";
+
+/* Live Chicago date/time and next order deadline */
+function tickNow(){
+  const el=document.getElementById("now");if(!el)return;
+  const now=new Date();
+  const t=now.toLocaleString("en-US",{timeZone:"America/Chicago",weekday:"long",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+  const d=DATES[0];
+  let next="";
+  if(d){const pd=new Date(d.v+"T12:00");const cut=new Date(pd);cut.setDate(cut.getDate()-1);
+    next=" · Next orders close "+cut.toLocaleDateString("en-US",{weekday:"short"})+" 9 PM for "+d.label+" pickup";}
+  el.textContent="Now in Chicago: "+t+next;
+}
+tickNow();setInterval(tickNow,30000);
+/* What's in season in Chicago, by month */
+const SEASON={
+  9:{t:"September harvest",items:["Tomatoes","Sweet corn","Peppers","Eggplant","Melons","Apples","Pears","Grapes","Green beans","Summer squash","Kale","Potatoes","Onions","Herbs"]},
+  10:{t:"October harvest",items:["Apples","Pears","Grapes","Winter squash","Pumpkins","Sweet potatoes","Potatoes","Brussels sprouts","Kale & collards","Cabbage","Cauliflower","Beets","Carrots","Radishes","Leeks & onions","Garlic","Fennel","Last peppers"]},
+  11:{t:"November harvest",items:["Apples","Pears","Winter squash","Sweet potatoes","Potatoes","Brussels sprouts","Kale","Cabbage","Beets","Carrots","Parsnips","Turnips & rutabaga","Leeks & onions","Garlic","Celery root","Spinach","Microgreens"]},
+  12:{t:"Winter market",items:["Storage apples","Winter squash","Potatoes","Sweet potatoes","Onions","Garlic","Carrots","Beets","Cabbage","Microgreens","Mushrooms"]}
+};
+(function(){
+  const m=Number(new Date().toLocaleString("en-US",{timeZone:"America/Chicago",month:"numeric"}));
+  const s=SEASON[m]||SEASON[10];
+  document.getElementById("seasonTitle").textContent=s.t;
+  const ul=document.getElementById("seasonList");
+  for(const i of s.items)ul.append(el("li",{},i));
+})();
 document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
 renderBoxes();renderItems();renderTicket();
 </script>
