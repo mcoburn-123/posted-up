@@ -226,7 +226,7 @@ textarea{min-height:64px;resize:vertical}
           <button type="button" role="radio" data-mode="box" aria-checked="true"><b>Shopper's Choice</b><small>We pick the best of the week. Boxes cost less than itemizing.</small></button>
           <button type="button" role="radio" data-mode="pick" aria-checked="false"><b>Build Your Own</b><small>Choose the kinds of things you want. We shop the best example at market.</small></button>
         </div>
-        <p class="policy"><b>This is a personal shopping service.</b> We shop live farmers markets, so you order by group, like "a sourdough loaf" or "winter squash," and we pick the best one that day. If something isn't at market, you're refunded for it, or you can choose a replacement of equal or greater value.</p>
+        <p class="policy"><b>This is a personal shopping service.</b> We shop live farmers markets, so you order by group, like "a sourdough loaf" or "winter squash," and we pick the best one that day. If something isn't at market, you get a credit for it on your next order, or you can choose a replacement of equal or greater value.</p>
       </div>
 
       <section class="bin" id="produce">
@@ -258,7 +258,7 @@ textarea{min-height:64px;resize:vertical}
           <li><b>What we do.</b> Posted Up Produce is a personal shopping service. You pay us to shop farmers markets and local makers for you and hand off your order. We don't grow or make the food ourselves.</li>
           <li><b>Payment.</b> Pay in full by 9 PM the night before pickup. Your order is confirmed only when payment arrives and we text you a confirmation. Unpaid orders are not shopped.</li>
           <li><b>What you get.</b> You get the box or item groups you ordered, chosen by us at market that day. Examples on the menu are typical, not promised. Weights are approximate.</li>
-          <li><b>Items we can't get.</b> If something you paid for isn't available, we refund that item's full price within 2 days, using the same method you paid with. If you opted in to swaps, we may substitute an item of equal or greater value instead, at no extra charge. We tell you what changed before or at handoff.</li>
+          <li><b>Items we can't get.</b> If something you paid for isn't available, its full price becomes a credit on your next order. Credits are used once, on your next order. Want cash back instead? Just ask and we refund it within 2 days, the same way you paid. Any credit not used by the end of the pilot (November 21) is refunded automatically. If you opted in to swaps, we may substitute an item of equal or greater value instead, at no extra charge. We tell you what changed before or at handoff.</li>
           <li><b>Cancellations.</b> Cancel by 9 PM the night before pickup for a full refund. After that, we've committed to shop for you, so we can't refund a cancellation.</li>
           <li><b>Pickup and delivery.</b> Pick up during your chosen window. Orders not picked up by the end of the window aren't refunded, but text us and we'll try to arrange a late handoff or delivery for the delivery fee. Delivery fees are confirmed by text before you pay.</li>
           <li><b>Quality.</b> If something arrives damaged or spoiled, text us a photo within 24 hours. We refund or replace that item.</li>
@@ -346,7 +346,7 @@ const STOPS=[
   {id:"hyde",name:"Hyde Park",time:"3:00–4:00 PM"},
   {id:"rogers",name:"Rogers Park",time:"5:00–6:00 PM"}
 ];
-const state={fulfill:"goose",address:"",mode:"box",box:null,breadBox:null,prefs:{},qty:{},name:"",phone:"",date:"",notes:"",sub:"refund",agree:false,sent:null};
+const state={fulfill:"goose",address:"",mode:"box",box:null,breadBox:null,prefs:{},qty:{},name:"",phone:"",date:"",notes:"",sub:"credit",agree:false,sent:null};
 const PICK_ONLY=["produce","bread"];
 
 /* Pickup dates: Wed (outdoor Wednesday market runs through Oct 28, 2026) and Sat (through Nov 21, 2026). */
@@ -424,7 +424,7 @@ function orderText(id){
   if(skip.length)L.push("  Skip: "+skip.join(", "));
   const adds=ALL.filter(i=>state.qty[i.id]);
   if(adds.length){L.push("Add-ons:");for(const i of adds)L.push("  "+state.qty[i.id]+" × "+i.nm+" — $"+state.qty[i.id]*i.p)}
-  L.push("","If unavailable: "+(state.sub==="replace"?"Replace with equal or greater value":"Refund me"));
+  L.push("","If unavailable: "+(state.sub==="replace"?"Replace with equal or greater value":state.sub==="refund"?"Refund me":"Credit my next order"));
   if(state.notes)L.push("Notes: "+state.notes);
   if(fee())L.push("Delivery fee — $"+fee()+" flat (+$"+PER_MILE.toFixed(2)+"/mi beyond "+FLAT_MILES+" mi, confirmed by text)");
   L.push("","TOTAL: $"+total());
@@ -439,7 +439,7 @@ function orderPayload(id){
   const st=isDel()?delStop():STOPS.find(x=>x.id===state.fulfill);
   return {orderNo:id,received:new Date().toISOString(),pickupDate:state.date,name:state.name.trim(),phone:state.phone.trim(),
     fulfillment:(isDel()?"Delivery from ":"Meet-up: ")+st.name,address:isDel()?state.address.trim():"",
-    style:state.mode==="box"?"Shopper's Choice":"Build Your Own",ifUnavailable:state.sub==="replace"?"Swap OK":"Refund",
+    style:state.mode==="box"?"Shopper's Choice":"Build Your Own",ifUnavailable:state.sub==="replace"?"Swap OK":state.sub==="refund"?"Refund":"Credit",
     notes:state.notes.trim(),items,deliveryFee:fee(),total:total()};
 }
 async function sendOrder(id){
@@ -513,13 +513,13 @@ function renderTicket(){
   sel.addEventListener("change",()=>state.date=sel.value);
   f.append(el("label",{for:"date"},isDel()?"Delivery day":"Pickup day",sel));
   const ss=el("select",{id:"sub"});
-  ss.append(el("option",{value:"refund"},"Refund me for it"),el("option",{value:"replace"},"Replace it with equal or greater value"));
+  ss.append(el("option",{value:"credit"},"Credit it to my next order"),el("option",{value:"replace"},"Replace it with equal or greater value"),el("option",{value:"refund"},"Refund me for it"));
   ss.value=state.sub;ss.addEventListener("change",()=>state.sub=ss.value);
   f.append(el("label",{for:"sub"},"If something isn't at market",ss));
   const ta=el("textarea",{id:"notes",placeholder:"Allergies, things you'd never want as a swap, ripeness…"});ta.value=state.notes;ta.addEventListener("input",()=>state.notes=ta.value);
   f.append(el("label",{for:"notes"},"Notes (optional)",ta));
   const ag=el("input",{id:"agree",type:"checkbox"});ag.checked=state.agree;ag.addEventListener("change",()=>{state.agree=ag.checked});
-  f.append(el("label",{for:"agree",class:"agree"},ag,el("span",{},"I agree to the ",el("a",{href:"#terms"},"Order Terms"),", including refunds for unavailable items and no refunds on cancellations after 9 PM the night before.")));
+  f.append(el("label",{for:"agree",class:"agree"},ag,el("span",{},"I agree to the ",el("a",{href:"#terms"},"Order Terms"),", including credits for unavailable items and no refunds on cancellations after 9 PM the night before.")));
   const err=el("p",{class:"err",id:"err"});
   f.append(err,el("button",{class:"cta",type:"submit"},"Get my order ticket"),el("div",{class:"cutoff"},"Orders close 9 PM the night before pickup. Payment is due up front."));
   if(!n)f.querySelector(".cta").disabled=true;
